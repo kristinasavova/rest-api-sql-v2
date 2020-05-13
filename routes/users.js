@@ -10,8 +10,8 @@ const authenticateUser = require ('./authentication');
 /* Send a GET request to /api/users to READ the currently authenticated user with 
 a status code 200. */  
 
-/* /* Passing the authenticateUser middleware func ahead of the router handler tells Express 
-to route GET req to the path "/api/users" first to the custom middleware func and then to the inline router handler func. */ 
+/* Passing the authenticateUser middleware func ahead of the router handler tells Express to route 
+GET req to the path "/api/users" first to the custom middleware func and then to the inline router handler func. */ 
 router.get ('/users', authenticateUser, async (req, res) => { 
     /* The current authenticated user's info is retrieved from the Req object's currentUser property. 
     The authenticateUser middleware func will set the currentUser property on Req only if the req is authenticated. */
