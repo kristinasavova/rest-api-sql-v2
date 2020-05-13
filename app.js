@@ -2,6 +2,7 @@
 
 const express = require ('express');
 const morgan = require ('morgan');
+const { sequelize } = require ('./models'); // import Sequelize
 
 // Variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -36,6 +37,15 @@ app.use ( (err, req, res, next) => {
 
 app.set ('port', process.env.PORT || 5000);
 
-const server = app.listen (app.get ('port'), () => {
-    console.log (`Express server is listening on port ${server.address().port}`);
+sequelize.sync () 
+    .then ( async () => { 
+        // Returns a promise that resolves to a successful, authenticated connection to the database
+        await sequelize.authenticate ();
+        console.log ('Connection to the database is successful!')
+    })
+    .then ( () => {
+        // Start a server
+        const server = app.listen (app.get ('port'), () => {
+        console.log (`Express server is listening on port ${server.address ().port}`);
+    })
 });
