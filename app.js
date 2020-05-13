@@ -1,8 +1,10 @@
 'use strict';
 
 const express = require ('express');
-const morgan = require ('morgan');
+const morgan = require ('morgan'); 
 const { sequelize } = require ('./models'); // import Sequelize
+const users = require ('./routes/users'); 
+const courses = require ('./routes/courses');  
 
 // Variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -12,7 +14,12 @@ const app = express ();
 // Setup morgan which gives us http request logging
 app.use (morgan ('dev'));
 
+// Make it possible to access values on request body - body parser
+app.use (express.json ());
+
 // Setup your api routes 
+app.use ('/api', users);
+app.use ('/api', courses); 
 
 // Setup a friendly greeting for the root route
 app.get ('/', (req, res) => {
@@ -20,8 +27,11 @@ app.get ('/', (req, res) => {
 });
 
 // Send 404 if no other route matched
-app.use ( (req, res) => {
-    res.status (404).json ({ message: 'Route Not Found' });
+app.use ( (req, res, next) => {
+    const err = new Error ('Not Found');
+    err.status = 404;
+    console.log ('Not Found', err);
+    next (err); 
 });
 
 // Setup a global error handler
