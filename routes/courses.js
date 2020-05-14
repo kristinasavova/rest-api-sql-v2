@@ -29,7 +29,9 @@ each course) with a status code 200 */
 
 router.get ('/courses', asyncHandler ( async (req, res, next) => {
     const courses = await Course.findAll ({
+        attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded'], 
         include: [{
+            attributes: ['id', 'firstName', 'lastName', 'emailAddress'],
             model: User,
             as: 'teacher' // alias 
         }]    
@@ -42,7 +44,9 @@ owns the course) with a status code 200 */
 
 router.get ('/courses/:id', asyncHandler ( async (req, res, next) => {
     const course = await Course.findByPk (req.params.id, { 
+        attributes: ['id', 'title', 'description', 'estimatedTime', 'materialsNeeded'],
         include: [{
+            attributes: ['id', 'firstName', 'lastName', 'emailAddress'],
             model: User,
             as: 'teacher'
         }]
@@ -140,7 +144,7 @@ router.delete ('/courses/:id', authenticateUser, asyncHandler ( async (req, res,
         await course.destroy ();
         res.status (204).end (); 
     } else {
-        res.status (404).json ({ message: 'Course not found '});
+        next (error); 
     }
 }));
 

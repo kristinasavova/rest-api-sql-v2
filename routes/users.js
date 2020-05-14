@@ -17,7 +17,9 @@ router.get ('/users', authenticateUser, async (req, res) => {
     The authenticateUser middleware func will set the currentUser property on Req only if the req is authenticated. */
     const user = req.currentUser; 
     res.status (200).json ({ 
-        name: user.firstName + ' ' + user.lastName,
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         username: user.emailAddress 
     });
 });
@@ -36,7 +38,19 @@ router.post ('/users', [
         .exists ({ checkFalsy: true, checkNull: true })
         .withMessage ('Please provide a value for "Email Address"')
         .isEmail ()
-        .withMessage ('Please provide a valid email address for "Email Address"'),
+        .withMessage ('Please provide a valid email address for "Email Address"')
+        .normalizeEmail ()
+        .custom ( (value, { req }) => { 
+            new Promise ( (resolve, reject) => {
+                User.findAll ({ where: { emailAddress: value }}), (err, user) => {
+                    if (user) {
+                        reject (new Error ('This e-mail address is already in use'));
+                    } else {
+                        resolve (); 
+                    }
+                } 
+            }).then ( () => console.log ('Promise resolved'));  
+        }),
     check ('password')
         .exists ({ checkFalsy: true, checkNull: true })
         .withMessage ('Please provide a value for "Password"')
