@@ -52,17 +52,16 @@ router.post ('/users', [
     try {
         const user = req.body; // get the user from the request body 
         user.password = bcryptjs.hashSync (user.password); // hash the new user's password  
-        await User.create (user);  
-        res.status (201).end ();
+        await User.create (user); 
+        /* The Location response-header field is used to redirect the recipient to a location other than 
+        the Request-URI for completion of the request or identification of a new resource. For 201 (Created) 
+        responses, the Location is that of the new resource which was created by the request. */   
+        res.status (201).set ('Location', '/').end ();
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
             res.status (400).json ({ errors: error.errors });
-            /* The Location response-header field is used to redirect the recipient to a location other than 
-            the Request-URI for completion of the request or identification of a new resource. For 201 (Created) 
-            responses, the Location is that of the new resource which was created by the request. */
-            res.set ('Location', '/');  
-            console.log ('Validation failed', error)
-            next (error);
+            console.log ('Validation failed', error);
+            next (error); 
         } else {
             next (error); 
         } 
