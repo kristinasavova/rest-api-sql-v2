@@ -112,13 +112,14 @@ router.put ('/courses/:id', authenticateUser, [
         res.status (400).json ({ errors: errorMessages }); 
     }
     try {
-        const course = await Course.findOne ({ where: {
-             id: req.params.id,
-             userId: req.currentUser.id 
-        }});
+        const course = await Course.findByPk (req.params.id);
         if (course) {
-           await course.update (req.body);
-           res.status (204).end ();  
+            if (course.userId == req.currentUser.id) {
+                await course.update (req.body);
+                res.status (204).end (); 
+            } else {
+                res.status (403). json ({ message: 'Access to the requested resource is forbidden' });
+            }
         } else {
             res.status (404).json ({ message: 'Course not found '});
         }

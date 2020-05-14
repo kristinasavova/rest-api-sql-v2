@@ -49,13 +49,12 @@ app.set ('port', process.env.PORT || 5000);
 
 sequelize.sync () 
     .then ( async () => { 
-        // Returns a promise that resolves to a successful, authenticated connection to the database
         await sequelize.authenticate ();
         console.log ('Connection to the database is successful!')
     })
     .then ( () => {
-        // Start a server
         const server = app.listen (app.get ('port'), () => {
-        console.log (`Express server is listening on port ${server.address ().port}`);
+            console.log (`Express server is listening on port ${server.address ().port}`);
+        });
     })
-});
+    .catch ( error => console.log ('There is an error connecting to the database or setting up a server', error));

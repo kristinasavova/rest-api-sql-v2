@@ -39,18 +39,7 @@ router.post ('/users', [
         .withMessage ('Please provide a value for "Email Address"')
         .isEmail ()
         .withMessage ('Please provide a valid email address for "Email Address"')
-        .normalizeEmail ()
-        .custom ( (value, { req }) => { 
-            new Promise ( (resolve, reject) => {
-                User.findAll ({ where: { emailAddress: value }}), (err, user) => {
-                    if (user) {
-                        reject (new Error ('This e-mail address is already in use'));
-                    } else {
-                        resolve (); 
-                    }
-                } 
-            }).then ( () => console.log ('Promise resolved'));  
-        }),
+        .normalizeEmail (),
     check ('password')
         .exists ({ checkFalsy: true, checkNull: true })
         .withMessage ('Please provide a value for "Password"')
@@ -75,6 +64,10 @@ router.post ('/users', [
         if (error.name === 'SequelizeValidationError') {
             res.status (400).json ({ errors: error.errors });
             console.log ('Validation failed', error);
+            next (error); 
+        } else if (error.name === 'SequelizeUniqueConstraintError') {
+            res.status (400).json ({ errors: error.errors });
+            console.log ('Email address is already in use!', error);
             next (error); 
         } else {
             next (error); 
