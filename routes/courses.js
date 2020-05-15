@@ -137,13 +137,16 @@ router.put ('/courses/:id', authenticateUser, [
 /* Send a DELETE request to /api/courses/:id to DELETE a course with a status code 204. */
 
 router.delete ('/courses/:id', authenticateUser, asyncHandler ( async (req, res, next) => {
-    const course = await Course.findOne ({ where: {
-        id: req.params.id,
-        userId: req.currentUser.id
-    }});
+    const course = await Course.findByPk (req.params.id
+        // userId: req.currentUser.id
+    );
     if (course) {
-        await course.destroy ();
-        res.status (204).end (); 
+        if (course.userId == req.currentUser.id) {
+            await course.destroy ();
+            res.status (204).end ();
+        } else {
+            res.status (403). json ({ message: 'Access to the requested resource is forbidden' });
+        } 
     } else {
         next (error); 
     }
