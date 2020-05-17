@@ -66,7 +66,7 @@ router.post ('/users', [
             console.log ('Validation failed', error);
             next (error); 
         } else if (error.name === 'SequelizeUniqueConstraintError') {
-            res.status (400).json ({ errors: error.errors });
+            res.status (400).json ({ errors: 'Email address is already in use!' });
             console.log ('Email address is already in use!', error);
             next (error); 
         } else {
